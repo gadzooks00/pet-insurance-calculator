@@ -19,10 +19,32 @@ with col1:
     for i in range(num_plans):
         with st.expander(f"Plan {i+1} Settings", expanded=False):
             name = st.text_input(f"Plan {i+1} - Name", value=f"Plan {chr(65+i)}", key=f"name_{i}")
-            monthly_premium = st.number_input(f"{name} - Monthly Premium ($)", min_value=0.0, value=30.0, key=f"premium_{i}")
-            deductible = st.number_input(f"{name} - Annual Deductible ($)", min_value=0.0, value=250.0, key=f"deductible_{i}")
-            reimbursement = st.slider(f"{name} - Reimbursement %", 50, 100, 80, key=f"reimbursement_{i}")
-            annual_max = st.text_input(f"{name} - Annual Max Payout ($ or 'unlimited')", value="5000", key=f"max_{i}")
+            default_premium = 30.0 if i == 0 else 45.0
+            default_deductible = 250.0 if i == 0 else 100.0
+            default_reimbursement = 80.0 if i == 0 else 90.0
+            default_max = "5000" if i == 0 else "unlimited"
+
+            monthly_premium = st.number_input(
+                f"{name} - Monthly Premium ($)",
+                min_value=0.0,
+                value=default_premium,
+                step=5.0,
+                key=f"premium_{i}"
+            )
+            deductible = st.number_input(
+                f"{name} - Annual Deductible ($)",
+                min_value=0.0,
+                value=default_deductible,
+                step=5.0,
+                key=f"deductible_{i}"
+            )
+            reimbursement = st.slider(
+                f"{name} - Reimbursement %", 50.0, 100.0,
+                value=default_reimbursement,
+                step=0.1,
+                key=f"reimbursement_{i}"
+            )
+            annual_max = st.text_input(f"{name} - Annual Max Payout ($ or 'unlimited')", value=default_max, key=f"max_{i}")
             if annual_max.strip().lower() == "unlimited":
                 annual_max = float("inf")
             else:
@@ -41,9 +63,9 @@ with col1:
 with col2:
     st.header("📈 Simulation Setup")
     years = st.slider("Years to Simulate", 5, 20, 15)
-    vet_inflation = st.number_input("Vet Cost Inflation Rate (%)", value=5.9) / 100
-    premium_inflation = st.number_input("Premium Cost Increase Rate (%)", value=13.0) / 100
-    base_year_vet_cost = st.number_input("Base Year Vet Cost ($)", value=600.0)
+    vet_inflation = st.number_input("Vet Cost Inflation Rate (%)", value=5.9, step=0.1) / 100
+    premium_inflation = st.number_input("Premium Cost Increase Rate (%)", value=13.0, step=0.1) / 100
+    base_year_vet_cost = st.number_input("Base Year Vet Cost ($)", value=600.0, step=10.0)
 
     st.subheader("⚠️ Add Health Events")
     health_events = []
@@ -51,7 +73,7 @@ with col2:
     for i in range(num_events):
         with st.expander(f"Health Event {i+1}", expanded=False):
             year = st.number_input(f"Year of Event {i+1}", min_value=1, max_value=years, value=i+3, key=f"event_year_{i}")
-            cost = st.number_input(f"Cost of Event {i+1} ($)", min_value=0.0, value=1200.0, key=f"event_cost_{i}")
+            cost = st.number_input(f"Cost of Event {i+1} ($)", min_value=0.0, value=1200.0, step=10.0, key=f"event_cost_{i}")
             health_events.append((year, cost))
     event_dict = {int(year): float(cost) for year, cost in health_events}
 
