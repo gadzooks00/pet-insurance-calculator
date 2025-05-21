@@ -11,7 +11,7 @@ This is a Streamlit-based interactive calculator for comparing pet insurance pla
 
 ## 🚀 Live Demo
 Deploy your own or visit:
-> _[https://streamlit.io/cloud](https://streamlit.io/cloud)_ to launch the app from this repo.
+> _[https://pet-insurance-calculator.streamlit.app/](https://pet-insurance-calculator.streamlit.app/)_ to launch the app from this repo.
 
 ## 📁 File Structure
 ```
