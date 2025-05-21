@@ -19,10 +19,10 @@ with col1:
     for i in range(num_plans):
         with st.expander(f"Plan {i+1} Settings", expanded=False):
             name = st.text_input(f"Plan {i+1} - Name", value=f"Plan {chr(65+i)}", key=f"name_{i}")
-            default_premium = 30.0 if i == 0 else 45.0
-            default_deductible = 250.0 if i == 0 else 100.0
-            default_reimbursement = 80.0 if i == 0 else 90.0
-            default_max = "5000" if i == 0 else "unlimited"
+            default_premium = 15.0 if i == 0 else 40.0
+            default_deductible = 500.0 if i == 0 else 250.0
+            default_reimbursement = 70.0 if i == 0 else 90.0
+            default_max = "10000" if i == 0 else "unlimited"
 
             monthly_premium = st.number_input(
                 f"{name} - Monthly Premium ($)",
@@ -70,10 +70,13 @@ with col2:
     st.subheader("⚠️ Add Health Events")
     health_events = []
     num_events = st.number_input("Number of Health Events", min_value=0, max_value=10, value=2)
+    default_event_data = [(3, 3000.0), (6, 600.0)]
     for i in range(num_events):
+        default_year = default_event_data[i][0] if i < len(default_event_data) else i + 3
+        default_cost = default_event_data[i][1] if i < len(default_event_data) else 1200.0
         with st.expander(f"Health Event {i+1}", expanded=False):
-            year = st.number_input(f"Year of Event {i+1}", min_value=1, max_value=years, value=i+3, key=f"event_year_{i}")
-            cost = st.number_input(f"Cost of Event {i+1} ($)", min_value=0.0, value=1200.0, step=10.0, key=f"event_cost_{i}")
+            year = st.number_input(f"Year of Event {i+1}", min_value=1, max_value=years, value=default_year, key=f"event_year_{i}")
+            cost = st.number_input(f"Cost of Event {i+1} ($)", min_value=0.0, value=default_cost, step=10.0, key=f"event_cost_{i}")
             health_events.append((year, cost))
     event_dict = {int(year): float(cost) for year, cost in health_events}
 
