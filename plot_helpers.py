@@ -36,7 +36,13 @@ def plot_first_year_bill(plans, base_vet_cost, first_event_cost):
         bar_labels.append(plan["name"])
         bar_values.append(out_of_pocket)
 
-    ax.bar(bar_labels, bar_values, label="With Insurance")
+    bars = ax.bar(bar_labels, bar_values, label="With Insurance")
+
+    for bar, value in zip(bars, bar_values):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width() / 2, height + 25, f"${value:,.0f}",
+                ha='center', va='bottom', fontsize=8)
+        
     ax.axhline(base_vet_cost + first_event_cost, color="black", linestyle="--", label="No Insurance")
     ax.set_ylabel("Estimated 1-Year Cost ($)")
     ax.set_title("First-Year Cost: Insurance vs No Insurance")

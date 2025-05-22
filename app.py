@@ -98,5 +98,5 @@ with c1:
 with c2:
     st.markdown("### 💥 Estimated First-Year Cost Comparison (Single Event)")
     first_event_cost = sorted(health_events, key=lambda x: x[0])[0][1] if health_events else 0.0
-    fig2 = plot_first_year_bill(base_year_vet_cost, plans, base_year_vet_cost, first_event_cost, calculate_out_of_pocket)
+    fig2 = plot_first_year_bill(plans, base_year_vet_cost, first_event_cost)
     st.pyplot(fig2)
