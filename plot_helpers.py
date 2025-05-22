@@ -14,26 +14,30 @@ def plot_cumulative_costs(years, no_insurance_costs, insurance_costs_by_plan):
     ax.legend()
     return fig
 
-def plot_first_year_bill(bill_cost, plans, base_vet_cost, first_event_cost, calculate_fn):
+def plot_first_year_bill(plans, base_vet_cost, first_event_cost):
     fig, ax = plt.subplots(figsize=(6, 4))
     bar_labels = []
     bar_values = []
 
-    bill = base_vet_cost + first_event_cost
-
     for plan in plans:
-        out_of_pocket = calculate_fn(
-            bill,
-            premium=plan["monthly_premium"] * 12,
-            deductible=plan["deductible"],
-            reimbursement=plan["reimbursement"],
-            max_payout=plan["max_payout"]
-        )
+        premium = plan["monthly_premium"] * 12
+        deductible = plan["deductible"]
+        reimbursement = plan["reimbursement"]
+        max_payout = plan["max_payout"]
+
+        # Apply insurance only to the event, not the base care
+        if first_event_cost <= deductible:
+            reimbursed = 0
+        else:
+            reimbursed = min((first_event_cost - deductible) * reimbursement, max_payout)
+
+        out_of_pocket = base_vet_cost + first_event_cost - reimbursed + premium
+
         bar_labels.append(plan["name"])
         bar_values.append(out_of_pocket)
 
     ax.bar(bar_labels, bar_values, label="With Insurance")
-    ax.axhline(first_event_cost, color="black", linestyle="--", label="No Insurance")
+    ax.axhline(base_vet_cost + first_event_cost, color="black", linestyle="--", label="No Insurance")
     ax.set_ylabel("Estimated 1-Year Cost ($)")
     ax.set_title("First-Year Cost: Insurance vs No Insurance")
     ax.legend()
