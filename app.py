@@ -19,10 +19,10 @@ with col1:
     for i in range(num_plans):
         with st.expander(f"Plan {i+1} Settings", expanded=False):
             name = st.text_input(f"Plan {i+1} - Name", value=f"Plan {chr(65+i)}", key=f"name_{i}")
-            default_premium = 15.0 if i == 0 else 40.0
-            default_deductible = 500.0 if i == 0 else 250.0
-            default_reimbursement = 70.0 if i == 0 else 90.0
-            default_max = "10000" if i == 0 else "unlimited"
+            default_premium = 40.78 if i == 0 else 12.11
+            default_deductible = 250.0 if i == 0 else 500.0
+            default_reimbursement = 90.0 if i == 0 else 70.0
+            default_max = "unlimited" if i == 0 else "10000"
 
             monthly_premium = st.number_input(
                 f"{name} - Monthly Premium ($)",

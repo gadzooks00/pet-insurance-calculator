@@ -15,9 +15,14 @@ def plot_cumulative_costs(years, no_insurance_costs, insurance_costs_by_plan):
     return fig
 
 def plot_first_year_bill(plans, base_vet_cost, first_event_cost):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(8, 5))
     bar_labels = []
-    bar_values = []
+    premiums = []
+    routine_costs = []
+    event_costs = []
+    totals = []
+
+    total_uninsured = base_vet_cost + first_event_cost
 
     for plan in plans:
         premium = plan["monthly_premium"] * 12
@@ -25,26 +30,42 @@ def plot_first_year_bill(plans, base_vet_cost, first_event_cost):
         reimbursement = plan["reimbursement"]
         max_payout = plan["max_payout"]
 
-        # Apply insurance only to the event, not the base care
         if first_event_cost <= deductible:
             reimbursed = 0
         else:
             reimbursed = min((first_event_cost - deductible) * reimbursement, max_payout)
 
-        out_of_pocket = base_vet_cost + first_event_cost - reimbursed + premium
+        net_event_cost = first_event_cost - reimbursed
+        total = base_vet_cost + net_event_cost + premium
 
         bar_labels.append(plan["name"])
-        bar_values.append(out_of_pocket)
+        premiums.append(premium)
+        routine_costs.append(base_vet_cost)
+        event_costs.append(net_event_cost)
+        totals.append(total)
 
-    bars = ax.bar(bar_labels, bar_values, label="With Insurance")
+    x = range(len(bar_labels))
+    bar1 = ax.bar(x, routine_costs, label="Routine Care")
+    bar2 = ax.bar(x, event_costs, bottom=routine_costs, label="Event Cost")
+    bar3 = ax.bar(x, premiums, bottom=[r + e for r, e in zip(routine_costs, event_costs)], label="Premium")
 
-    for bar, value in zip(bars, bar_values):
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width() / 2, height + 25, f"${value:,.0f}",
-                ha='center', va='bottom', fontsize=8)
-        
-    ax.axhline(base_vet_cost + first_event_cost, color="black", linestyle="--", label="No Insurance")
+    for i in x:
+        # Label each component separately on the total bar
+        y_offset = 0
+        ax.text(i, y_offset + routine_costs[i]/2, f"Routine: ${routine_costs[i]:,.0f}",
+                ha='center', va='center', fontsize=7, color='white')
+        y_offset += routine_costs[i]
+        ax.text(i, y_offset + event_costs[i]/2, f"Event: ${event_costs[i]:,.0f}",
+                ha='center', va='center', fontsize=7, color='white')
+        y_offset += event_costs[i]
+        ax.text(i, y_offset + premiums[i]/2, f"Premium: ${premiums[i]:,.0f}",
+                ha='center', va='center', fontsize=7, color='white')
+        ax.text(i, totals[i] + 25, f"Total: ${totals[i]:,.0f}", ha='center', va='bottom', fontsize=8)
+
+    ax.axhline(total_uninsured, color="black", linestyle="--", label="No Insurance")
+    ax.set_xticks(x)
+    ax.set_xticklabels(bar_labels)
     ax.set_ylabel("Estimated 1-Year Cost ($)")
-    ax.set_title("First-Year Cost: Insurance vs No Insurance")
+    ax.set_title("First-Year Cost Breakdown: Insurance vs No Insurance")
     ax.legend()
     return fig
