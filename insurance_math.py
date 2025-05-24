@@ -26,15 +26,19 @@ def simulate_yearly_costs(
     for year in range(1, years + 1):
         vet_cost *= (1 + vet_inflation) if year > 1 else 1
         premium *= (1 + premium_inflation) if year > 1 else 1
-        year_cost = vet_cost + event_dict.get(year, 0)
+        
+        routine_cost = vet_cost
+        event_cost = event_dict.get(year, 0)
 
-        if year_cost <= plan["deductible"]:
-            payout = 0
+        if event_cost <= plan["deductible"]:
+            reimbursed = 0
         else:
-            payout = min((year_cost - plan["deductible"]) * plan["reimbursement"], plan["max_payout"])
+            reimbursed = min((event_cost - plan["deductible"]) * plan["reimbursement"], plan["max_payout"])
 
-        out_of_pocket = year_cost - payout + premium
-        cumulative_cost += out_of_pocket
+        net_event_cost = event_cost - reimbursed
+        
+        year_total  = routine_cost + net_event_cost + premium
+        cumulative_cost += year_total 
         cumulative_costs.append(cumulative_cost)
 
     return cumulative_costs
